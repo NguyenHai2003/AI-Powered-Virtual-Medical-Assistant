@@ -1,0 +1,40 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi", "Hello", "Hey", "Good morning", "Good afternoon",
+        "Howdy", "What's up?", "Greetings", "Is anyone there?", "How are you?"
+      ],
+      "responses": [
+        "Hello!", "Hi there!", "Hey, how’s it going?", "Good to see you!", "Howdy!",
+        "Greetings, friend!", "Nice to meet you!", "Hey, how can I assist you?", "Hi! What’s on your mind?", "Good day!"
+      ],
+      "context_set": ""
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "Bye", "Goodbye", "See you later", "Take care", "Catch you later",
+        "Have a great day", "Farewell", "Talk to you soon", "See ya", "Cya"
+      ],
+      "responses": [
+        "Goodbye! Have a great day!", "Take care!", "See you soon!", "It was nice talking to you!", "Bye for now!",
+        "Catch you later!", "Stay safe!", "Hope to see you again!", "Farewell!", "Talk to you later!"
+      ],
+      "context_set": ""
+    },
+    {
+      "tag": "how",
+      "patterns": [
+        "How are you?", "How's your day?", "How do you feel?", "Are you okay?", "What's up?",
+        "How's it going?", "How have you been?", "Everything alright?", "How's life?", "Are you good?"
+      ],
+      "responses": [
+        "I'm great, thanks for asking!", "I'm doing well, how about you?", "Feeling awesome today!", "I'm fine, how can I help?", "I'm here and ready to assist you!",
+        "All good! Thanks for asking!", "Doing great, hope you are too!", "Feeling fantastic!", "I'm good, thanks!", "I feel great today!"
+      ],
+      "context_set": ""
+    }
+  ]
+}

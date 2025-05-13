@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HealthGPT - Chuyên gia Sức Khỏe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2a9d8f, #1d766a);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #chat-history {
+            width: 300px;
+            background-color: #fff;
+            border-right: 1px solid #e2e8f0;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-history h3 {
+            color: #2a9d8f;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        #history-list {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        #history-list li {
+            padding: 12px;
+            margin-bottom: 8px;
+            background-color: #f1f5f8;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #history-list li:hover {
+            background-color: #e2e8f0;
+        }
+
+        #history-list li.active {
+            background-color: #2a9d8f;
+            color: white;
+        }
+
+        .delete-session-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+
+        .delete-session-btn:hover {
+            background-color: #dc2626;
+        }
+
+        #chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 10px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.5;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            max-width: 70%;
+        }
+
+        .sent .message-content {
+            background-color: #2a9d8f;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .received .message-content {
+            background-color: #e9f5f2;
+            color: #1f2937;
+            border-bottom-left-radius: 2px;
+        }
+
+        /* Định dạng cho nội dung bot */
+        .formatted-response h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 10px 0;
+            color: #2a9d8f;
+        }
+
+        .formatted-response p {
+            margin: 8px 0;
+        }
+
+        .formatted-response ul {
+            list-style-type: disc;
+            margin: 8px 0 8px 20px;
+        }
+
+        .formatted-response ul li {
+            margin: 4px 0;
+        }
+
+        .formatted-response pre {
+            background-color: #f1f5f8;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .formatted-response code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+        }
+
+        #chat-input {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #fff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #voice-button {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: transform 0.2s;
+        }
+
+        #voice-button:hover {
+            transform: scale(1.1);
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #user-input:focus {
+            border-color: #2a9d8f;
+        }
+
+        #send-button {
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin-left: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #send-button:hover {
+            background-color: #21867a;
+        }
+
+        #new-chat-button, #clear-history {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #new-chat-button:hover {
+            background-color: #059669;
+        }
+
+        #clear-history {
+            background-color: #ef4444;
+        }
+
+        #clear-history:hover {
+            background-color: #dc2626;
+        }
+
+        .avatar-doctor {
+            background-image: url('https://cdn-icons-png.flaticon.com/512/387/387561.png');
+            background-size: cover;
+        }
+
+        .avatar-user {
+            background-image: url('https://cdn-icons-png.flaticon.com/512/847/847969.png');
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        🩺 HealthAI – Tư vấn Sức khỏe Trực tuyến
+    </header>
+
+    <div id="main-container">
+        <div id="chat-history">
+            <h3>Lịch sử trò chuyện</h3>
+            <button id="new-chat-button">Bắt đầu cuộc trò chuyện mới</button>
+            <ul id="history-list"></ul>
+            <button id="clear-history">Xóa tất cả cuộc trò chuyện</button>
+        </div>
+
+        <div id="chat-container">
+            <div id="chat-messages"></div>
+            <div id="chat-input">
+                <button id="voice-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Biểu tượng micrô" class="h-[18px] w-[18px]" font-size="inherit">
+                        <path d="M18.9953 11.5415C19.5246 11.6991 19.826 12.2559 19.6685 12.7852C18.7771 15.7804 16.179 18.0417 13 18.4381V19.5H14.5C15.0523 19.5 15.5 19.9477 15.5 20.5C15.5 21.0523 15.0523 21.5 14.5 21.5H9.50002C8.94773 21.5 8.50002 21.0523 8.50002 20.5C8.50002 19.9477 8.94773 19.5 9.50002 19.5H11V18.4381C7.82093 18.0418 5.22279 15.7805 4.33136 12.7852C4.17382 12.2559 4.47522 11.6991 5.00456 11.5415C5.5339 11.384 6.09073 11.6854 6.24827 12.2148C6.98609 14.6939 9.28339 16.5 11.9999 16.5C14.7165 16.5 17.0138 14.6939 17.7516 12.2148C17.9091 11.6854 18.466 11.384 18.9953 11.5415Z" fill="currentColor"></path>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 10.5V7C14.5 5.61929 13.3807 4.5 12 4.5C10.6193 4.5 9.5 5.61929 9.5 7V10.5C9.5 11.8807 10.6193 13 12 13C13.3807 13 14.5 11.8807 14.5 10.5ZM12 2.5C9.51472 2.5 7.5 4.51472 7.5 7V10.5C7.5 12.9853 9.51472 15 12 15C14.4853 15 16.5 12.9853 16.5 10.5V7C16.5 4.51472 14.4853 2.5 12 2.5Z" fill="currentColor"></path>
+                    </svg>
+                </button>
+                <input type="text" id="user-input" placeholder="Nhập câu hỏi của bạn..."/>
+                <button id="send-button">Gửi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const recognition = window.SpeechRecognition || window.webkitSpeechRecognition
+            ? new (window.SpeechRecognition || window.webkitSpeechRecognition)()
+            : null;
+
+        let currentSessionId = null;
+        let currentUtterance = null;
+
+        function speak(text) {
+            if (currentUtterance) {
+                window.speechSynthesis.cancel();
+            }
+
+            // Loại bỏ thẻ HTML trước khi đọc
+            const plainText = text.replace(/<[^>]+>/g, '');
+            currentUtterance = new SpeechSynthesisUtterance(plainText);
+            currentUtterance.lang = 'vi-VN';
+            currentUtterance.onend = function() {
+                currentUtterance = null;
+            };
+            window.speechSynthesis.speak(currentUtterance);
+        }
+
+        function scrollToBottom() {
+            $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+        }
+
+        function appendMessage(sender, text) {
+            $('#chat-messages').append(`
+                <div class="message ${sender}">
+                    <div class="avatar ${sender === 'sent' ? 'avatar-user' : 'avatar-doctor'}"></div>
+                    <div class="message-content">${text}</div>
+                </div>
+            `);
+            scrollToBottom();
+        }
+
+        function loadHistory() {
+            $.get('/get_sessions', function (data) {
+                $('#history-list').html('');
+                data.forEach((session) => {
+                    $('#history-list').append(`
+                        <li data-session-id="${session.session_id}">
+                            <span>${session.title}</span>
+                            <button class="delete-session-btn" data-session-id="${session.session_id}">Xóa</button>
+                        </li>
+                    `);
+                });
+            });
+        }
+
+        function loadSessionMessages(sessionId) {
+            $.get(`/get_session_messages?session_id=${sessionId}`, function (data) {
+                $('#chat-messages').html('');
+                data.forEach(msg => {
+                    appendMessage(msg.sender === 'user' ? 'sent' : 'received', msg.message);
+                });
+                currentSessionId = sessionId;
+                $('#history-list li').removeClass('active');
+                $(`#history-list li[data-session-id="${sessionId}"]`).addClass('active');
+            });
+        }
+
+        function startNewSession() {
+            $.post('/start_new_session', function (data) {
+                currentSessionId = data.session_id;
+                $('#chat-messages').html('');
+                loadHistory();
+            });
+        }
+
+        function deleteSession(sessionId) {
+            if (confirm('Bạn có chắc muốn xóa cuộc trò chuyện này?')) {
+                $.ajax({
+                    url: '/delete_session',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ session_id: sessionId }),
+                    success: function () {
+                        if (currentSessionId === sessionId) {
+                            $('#chat-messages').html('');
+                            currentSessionId = null;
+                        }
+                        loadHistory();
+                    },
+                    error: function () {
+                        alert('Xóa thất bại. Vui lòng thử lại!');
+                    }
+                });
+            }
+        }
+
+        function sendMessage() {
+            const message = $('#user-input').val().trim();
+            if (!message) return;
+
+            appendMessage('sent', message);
+            $('#user-input').val('');
+
+            $.ajax({
+                url: '/handle_message',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ message, session_id: currentSessionId }),
+                success: function (data) {
+                    appendMessage('received', data.response);
+                    speak(data.response); // Đọc văn bản sau khi loại bỏ HTML
+                    currentSessionId = data.session_id;
+                    loadHistory();
+                },
+                error: function() {
+                    appendMessage('received', 'Đã xảy ra lỗi. Vui lòng thử lại!');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            loadHistory();
+
+            $('#send-button').click(sendMessage);
+            $('#user-input').keypress(function (e) {
+                if (e.which === 13) sendMessage();
+            });
+
+            $('#voice-button').click(() => {
+                if (recognition) {
+                    recognition.lang = 'vi-VN';
+                    recognition.start();
+                }
+            });
+
+            if (recognition) {
+                recognition.onresult = function (event) {
+                    const transcript = event.results[0][0].transcript;
+                    $('#user-input').val(transcript);
+                    sendMessage();
+                };
+            }
+
+            $('#new-chat-button').click(startNewSession);
+
+            $('#clear-history').click(function () {
+                if (confirm('Bạn có chắc muốn xóa tất cả cuộc trò chuyện?')) {
+                    $.get('/clear_history', function () {
+                        $('#chat-messages').html('');
+                        $('#history-list').html('');
+                        currentSessionId = null;
+                        if (currentUtterance) {
+                            window.speechSynthesis.cancel();
+                            currentUtterance = null;
+                        }
+                    });
+                }
+            });
+
+            $('#history-list').on('click', 'li span', function () {
+                const sessionId = $(this).parent().data('session-id');
+                loadSessionMessages(sessionId);
+                if (currentUtterance) {
+                    window.speechSynthesis.cancel();
+                    currentUtterance = null;
+                }
+            });
+
+            $('#history-list').on('click', '.delete-session-btn', function (e) {
+                e.stopPropagation();
+                const sessionId = $(this).data('session-id');
+                deleteSession(sessionId);
+            });
+        });
+    </script>
+</body>
+</html>
