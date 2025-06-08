@@ -6,7 +6,7 @@ Thu thập dữ liệu nhịp tim và SpO₂ bằng cảm biến MAX30102
 
 Nhúng mô hình học máy vào ESP32 (C++) để dự đoán tình trạng sức khỏe
 
-Giao diện web tương tác với người dùng, sử dụng Gemini API để đưa ra lời khuyên
+Giao diện web tương tác với người dùng, xây dựng Chatbot kết hợp Gemini API để đưa ra lời khuyên
 
 ## 🔧 Công nghệ
 Python, TensorFlow (Huấn luyện mô hình)
